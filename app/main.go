@@ -16,13 +16,16 @@ func main() {
 	connStr := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=5432 sslmode=disable",
 		dbCfg.User, dbCfg.Name, dbCfg.Pass, dbCfg.Host)
 
-	db, err := dbConn.DbOpen(connStr, "postgres")
+	db, err := dbConn.DbOpen(connStr)
 	if err != nil {
 		fmt.Printf("db open failed: %v", err)
+		return
 	}
-	dbConn.InitConn(db)
 
-	server := api.NewServer(":8080", nil)
+	dbConn.InitConn(db)
+	// db.AutoMigrate()
+
+	server := api.NewServer(":8080", db)
 
 	if err := server.Run(); err != nil {
 		log.Fatal(err)
