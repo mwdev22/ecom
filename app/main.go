@@ -3,33 +3,24 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/mwdev22/ecom/app/api"
-	"github.com/mwdev22/ecom/app/db"
+	env "github.com/mwdev22/ecom/app/config"
+	dbConn "github.com/mwdev22/ecom/app/db"
 )
 
 func main() {
 
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
-
-	dbHost := os.Getenv("DB_HOST")
-	dbName := os.Getenv("DB_NAME")
-	dbUser := os.Getenv("DB_USER")
-	dbPass := os.Getenv("DB_PASSWORD")
+	dbCfg := env.GetDbCfg()
 
 	connStr := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=5432 sslmode=disable",
-		dbUser, dbName, dbPass, dbHost)
+		dbCfg.User, dbCfg.Name, dbCfg.Pass, dbCfg.Host)
 
-	db, err := db.NewPGConnection(connStr)
+	db, err := dbConn.DbOpen(connStr, "postgres")
 	if err != nil {
-		log.Fatal("db connection failed: %v", err)
+		fmt.Printf("db open failed: %v", err)
 	}
-
-	fmt.Println("connected with %v", dbName)
+	dbConn.InitConn(db)
 
 	server := api.NewServer(":8080", nil)
 
