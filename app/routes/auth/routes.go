@@ -22,7 +22,16 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 }
 
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
-
+	var payload types.LoginUserPayload
+	if err := utils.ParseJSON(r, payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+	}
+	user, err := h.store.GetUserByEmail(payload.Email)
+	if err != nil {
+		utils.WriteError(w, http.StatusConflict, err)
+	}
+	// TODO jwt token
+	utils.WriteJSON(w, http.StatusOK, user)
 }
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +41,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 	err := h.store.CreateUser(&payload)
 	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest, err)
+		utils.WriteError(w, http.StatusConflict, err)
 	}
 	utils.WriteJSON(w, http.StatusCreated, err)
 }
