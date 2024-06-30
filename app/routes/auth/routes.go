@@ -9,10 +9,11 @@ import (
 )
 
 type Handler struct {
+	store Store
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(store Store) *Handler {
+	return &Handler{store: store}
 }
 
 func (h *Handler) RegisterRoutes(router *mux.Router) {
@@ -29,5 +30,9 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	if err := utils.ParseJSON(r, payload); err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err) // bad request, problem on the user's
 	}
-
+	err := h.store.CreateUser(&payload)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+	}
+	utils.WriteJSON(w, http.StatusCreated, err)
 }

@@ -24,7 +24,9 @@ func (s *Server) Run() error {
 	router := mux.NewRouter()
 	// prefix, because if api changes to new version we can change it
 	subrouter := router.PathPrefix("/api/v1").Subrouter()
-	authHandler := auth.NewHandler()
+
+	authStore := auth.NewStore(s.db)
+	authHandler := auth.NewHandler(authStore)
 	authHandler.RegisterRoutes(subrouter)
 
 	return http.ListenAndServe(s.addr, router)
