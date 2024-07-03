@@ -36,12 +36,18 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	var payload types.RegisterUserPayload
-	if err := utils.ParseJSON(r, payload); err != nil {
-		utils.WriteError(w, http.StatusBadRequest, err) // bad request, problem on the user's
+	if err := utils.ParseJSON(r, &payload); err != nil { // Pass the address of payload here
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
 	}
+
 	err := h.store.CreateUser(&payload)
 	if err != nil {
 		utils.WriteError(w, http.StatusConflict, err)
+		return
 	}
-	utils.WriteJSON(w, http.StatusCreated, err)
+
+	msg := make(map[string]string)
+	msg["success"] = "user created successfully"
+	utils.WriteJSON(w, http.StatusCreated, msg)
 }

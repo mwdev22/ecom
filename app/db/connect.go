@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/mwdev22/ecom/app/routes/auth"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -20,6 +21,7 @@ func DbOpen(connString string) (*gorm.DB, error) {
 
 func InitConn(db *gorm.DB) {
 	sqlDB, err := db.DB()
+	db.AutoMigrate(models...)
 	if err != nil {
 		log.Fatal("Failed to get DB from GORM:", err)
 	}
@@ -30,3 +32,5 @@ func InitConn(db *gorm.DB) {
 		log.Fatal(err)
 	}
 }
+
+var models = []interface{}{&auth.User{}}

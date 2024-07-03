@@ -24,22 +24,27 @@ func NewStore(db *gorm.DB) Store {
 	return Store{db: db}
 }
 
-func (s *Store) CreateUser(user *types.RegisterUserPayload) error {
+func (s *Store) CreateUser(payload *types.RegisterUserPayload) error {
 	var existingUser User
-	result := s.db.Where("email = ?", user.Email).First(&existingUser)
+	result := s.db.Where("email = ?", payload.Email).First(&existingUser)
 	if result.Error == nil {
-		return fmt.Errorf("user with email %s already exists", user.Email)
+		return fmt.Errorf("user with email %s already exists", payload.Email)
 	} else if result.Error != gorm.ErrRecordNotFound {
 		return fmt.Errorf("error checking existing user: %w", result.Error)
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return fmt.Errorf("failed to hash password: %w", err)
 	}
-	user.Password = string(hashedPassword)
+	user := User{
+		Email:     payload.Email,
+		FirstName: payload.FirstName,
+		LastName:  payload.LastName,
+		Password:  string(hashedPassword),
+	}
 
-	if err := s.db.Create(user).Error; err != nil {
+	if err := s.db.Create(&user).Error; err != nil {
 		return fmt.Errorf("failed to create user: %w", err)
 	}
 	return nil
