@@ -32,12 +32,11 @@ type UserStore interface {
 }
 
 func (s *Store) CreateUser(payload *types.RegisterUserPayload) error {
-	var existingUser User
-	result := s.db.Where("email = ?", payload.Email).First(&existingUser)
-	if result.Error == nil {
-		return fmt.Errorf("user with email %s already exists", payload.Email)
-	} else if result.Error != gorm.ErrRecordNotFound {
-		return fmt.Errorf("error checking existing user: %w", result.Error)
+	result, err := s.GetUserByEmail(payload.Email)
+	if err == nil {
+		return fmt.Errorf("user with email %s already exists", result.Email)
+	} else if err != gorm.ErrRecordNotFound {
+		return fmt.Errorf("error checking existing user: %w", err)
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
@@ -59,7 +58,7 @@ func (s *Store) CreateUser(payload *types.RegisterUserPayload) error {
 
 func (s *Store) GetUserByEmail(email string) (*User, error) {
 	var user User
-	if err := s.db.First(&user, email).Error; err != nil {
+	if err := s.db.Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
 	return &user, nil

@@ -25,3 +25,5 @@ func GetDbCfg() DbConfig {
 		Pass: os.Getenv("DB_PASSWORD"),
 	}
 }
+
+var SecretKey = []byte("4325tcwergtasfsGF453VYRE43YQ34")
