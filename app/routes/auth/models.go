@@ -24,6 +24,13 @@ func NewStore(db *gorm.DB) Store {
 	return Store{db: db}
 }
 
+type UserStore interface {
+	CreateUser(payload *types.RegisterUserPayload) error
+	GetUserByEmail(email string) (*User, error)
+	UpdateUser(db *gorm.DB, user *User) error
+	DeleteUser(db *gorm.DB, id uint) error
+}
+
 func (s *Store) CreateUser(payload *types.RegisterUserPayload) error {
 	var existingUser User
 	result := s.db.Where("email = ?", payload.Email).First(&existingUser)
