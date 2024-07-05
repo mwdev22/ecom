@@ -16,22 +16,15 @@ type User struct {
 	Password  string
 }
 
-type Store struct {
+type UserStore struct {
 	db *gorm.DB
 }
 
-func NewStore(db *gorm.DB) Store {
-	return Store{db: db}
+func NewUserStore(db *gorm.DB) UserStore {
+	return UserStore{db: db}
 }
 
-type UserStore interface {
-	CreateUser(payload *types.RegisterUserPayload) error
-	GetUserByEmail(email string) (*User, error)
-	UpdateUser(db *gorm.DB, user *User) error
-	DeleteUser(db *gorm.DB, id uint) error
-}
-
-func (s *Store) CreateUser(payload *types.RegisterUserPayload) error {
+func (s *UserStore) CreateUser(payload *types.RegisterUserPayload) error {
 	result, err := s.GetUserByEmail(payload.Email)
 	if err == nil {
 		return fmt.Errorf("user with email %s already exists", result.Email)
@@ -56,7 +49,7 @@ func (s *Store) CreateUser(payload *types.RegisterUserPayload) error {
 	return nil
 }
 
-func (s *Store) GetUserByEmail(email string) (*User, error) {
+func (s *UserStore) GetUserByEmail(email string) (*User, error) {
 	var user User
 	if err := s.db.Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
