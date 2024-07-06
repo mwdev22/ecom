@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/mwdev22/ecom/app/routes/auth"
+	"github.com/mwdev22/ecom/app/routes/product"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -33,4 +34,4 @@ func InitConn(db *gorm.DB) {
 	}
 }
 
-var models = []interface{}{&auth.User{}}
+var models = []interface{}{&auth.User{}, product.Product{}}

@@ -20,7 +20,7 @@ type UserStore struct {
 	db *gorm.DB
 }
 
-func NewUserStore(db *gorm.DB) UserStore {
+func NewStore(db *gorm.DB) UserStore {
 	return UserStore{db: db}
 }
 
@@ -57,8 +57,8 @@ func (s *UserStore) GetUserByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
-func UpdateUser(db *gorm.DB, user *User) error {
-	if err := db.Save(user).Error; err != nil {
+func (s *UserStore) UpdateUser(user *User) error {
+	if err := s.db.Save(user).Error; err != nil {
 		return fmt.Errorf("failed to update user: %w", err)
 	}
 	return nil

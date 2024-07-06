@@ -1,0 +1,1 @@
+just a simple golang rest api, learning the basic concepts

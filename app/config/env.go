@@ -26,4 +26,4 @@ func GetDbCfg() DbConfig {
 	}
 }
 
-var SecretKey = []byte("4325tcwergtasfsGF453VYRE43YQ34")
+var SecretKey = []byte(os.Getenv("SECRET_KEY"))
